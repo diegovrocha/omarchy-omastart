@@ -45,9 +45,15 @@ function nextWorkspaceId(config) {
   return max + 1
 }
 
-function addWorkspace(config, label) {
+function hasWorkspace(config, workspaceId) {
+  return config.workspaces.some(function(w) { return w.id === workspaceId })
+}
+
+function addWorkspace(config, workspaceId, label) {
+  if (workspaceId < 1 || hasWorkspace(config, workspaceId)) return config
   var next = cloneConfig(config)
-  next.workspaces.push({ id: nextWorkspaceId(config), label: label || "Workspace", apps: [] })
+  next.workspaces.push({ id: workspaceId, label: label || "Workspace", apps: [] })
+  next.workspaces.sort(function(a, b) { return a.id - b.id })
   return next
 }
 
@@ -57,11 +63,22 @@ function removeWorkspace(config, workspaceId) {
   return next
 }
 
-function addApp(config, workspaceId, name, cmd) {
+function addApp(config, workspaceId, name, cmd, window) {
   var next = cloneConfig(config)
   for (var i = 0; i < next.workspaces.length; i++) {
     if (next.workspaces[i].id === workspaceId) {
-      next.workspaces[i].apps.push({ name: name, cmd: cmd })
+      next.workspaces[i].apps.push({ name: name, cmd: cmd, window: window })
+      break
+    }
+  }
+  return next
+}
+
+function setAppWindow(config, workspaceId, appIndex, window) {
+  var next = cloneConfig(config)
+  for (var i = 0; i < next.workspaces.length; i++) {
+    if (next.workspaces[i].id === workspaceId) {
+      next.workspaces[i].apps[appIndex].window = window
       break
     }
   }
@@ -89,6 +106,10 @@ function dispatchArg(cmd, workspaceId) {
   return 'hl.dsp.exec_cmd("' + luaQuote(cmd) + '", { workspace = "' + workspaceId + ' silent" })'
 }
 
+function moveArg(address, workspaceId) {
+  return 'hl.dsp.window.move({ workspace = "' + workspaceId + '", follow = false, window = "address:' + luaQuote(address) + '" })'
+}
+
 // Flat list of {workspaceId, cmd} launch jobs for every app in every
 // workspace, in workspace order - what the "start work apps" action fires.
 function hasAnyApps(config) {
@@ -103,7 +124,7 @@ function launchPlan(config) {
   for (var i = 0; i < config.workspaces.length; i++) {
     var ws = config.workspaces[i]
     for (var j = 0; j < ws.apps.length; j++) {
-      plan.push({ workspaceId: ws.id, cmd: ws.apps[j].cmd })
+      plan.push({ workspaceId: ws.id, appIndex: j, cmd: ws.apps[j].cmd, window: ws.apps[j].window || "" })
     }
   }
   return plan
@@ -116,13 +137,16 @@ if (typeof module !== "undefined") {
     serializeConfig: serializeConfig,
     cloneConfig: cloneConfig,
     nextWorkspaceId: nextWorkspaceId,
+    hasWorkspace: hasWorkspace,
     addWorkspace: addWorkspace,
     removeWorkspace: removeWorkspace,
     addApp: addApp,
+    setAppWindow: setAppWindow,
     removeApp: removeApp,
     hasAnyApps: hasAnyApps,
     luaQuote: luaQuote,
     dispatchArg: dispatchArg,
+    moveArg: moveArg,
     launchPlan: launchPlan
   }
 }

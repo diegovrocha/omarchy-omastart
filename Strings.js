@@ -7,6 +7,7 @@ var TABLE = {
     title: "Iniciar dia de trabalho?",
     subtitle: "Abre cada app configurado abaixo no workspace dele.",
     startButton: "Iniciar aplicativos de trabalho",
+    startingButton: "Iniciando aplicativos de trabalho…",
     workspacesHeader: "WORKSPACES",
     workspaceLabel: "Workspace",
     removeWorkspaceTip: "Remover workspace",
@@ -15,12 +16,14 @@ var TABLE = {
     commandPlaceholder: "Comando",
     addAppTip: "Adicionar app",
     newWorkspacePlaceholder: "Nome do novo workspace",
-    addWorkspaceButton: "Adicionar workspace"
+    addWorkspaceButton: "Adicionar workspace",
+    workspaceTaken: "O workspace %1 já existe"
   },
   "en_US": {
     title: "Start your work day?",
     subtitle: "Opens each app configured below on its own workspace.",
     startButton: "Start work apps",
+    startingButton: "Starting work apps…",
     workspacesHeader: "WORKSPACES",
     workspaceLabel: "Workspace",
     removeWorkspaceTip: "Remove workspace",
@@ -29,7 +32,8 @@ var TABLE = {
     commandPlaceholder: "Command",
     addAppTip: "Add app",
     newWorkspacePlaceholder: "New workspace name",
-    addWorkspaceButton: "Add workspace"
+    addWorkspaceButton: "Add workspace",
+    workspaceTaken: "Workspace %1 already exists"
   }
 }
 
